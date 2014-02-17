@@ -1,5 +1,5 @@
 package com.example.gps_project;
-
+//Too obvious
 public class Book {
 
 	 private int id;

@@ -1,5 +1,7 @@
 package com.example.gps_project;
-
+//THe example I had was on books, but it isnt difficult to update. In my opnion, we dont need
+//to change it. This is an extra (we dont need SQLite in the cellphone. I just put because it
+//is nice, so I`m just getting the gps value ( we can add one feature or two. We decide.
 
 //import com.example.android.;
 import java.util.LinkedList;

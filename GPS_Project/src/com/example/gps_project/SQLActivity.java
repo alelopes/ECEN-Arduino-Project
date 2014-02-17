@@ -1,5 +1,8 @@
 package com.example.gps_project;
 
+// Activity to plot the SQLITE in a list.
+
+
 import java.util.List;
 
 import com.example.gps_project.Book;

@@ -6,6 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="button_start">Start</string>
     <string name="button_update">Update</string>
+    <string name="button_send">Send</string>
     <string name="value1">Values On the List</string>
     <string name="valuelatm">Latitude</string>
     <string name="valuelonm">Longitude</string>
