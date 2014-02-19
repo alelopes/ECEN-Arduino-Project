@@ -12,5 +12,8 @@
     <string name="valuelonm">Longitude</string>
     <string name="title_activity_sql">SQLActivity</string>
     <string name="button_change">View</string>
+    <string name="value0">Set IP</string>
+    <string name="button_erase">Erase</string>
+    <string name="button_getsensor">Get Sensor</string>
     
 </resources>

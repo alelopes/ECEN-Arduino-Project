@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 
+//import com.example.android2.R;
 import com.example.gps_project.MySQLiteHelper;
 
 
@@ -23,13 +24,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 //import android.widget.Toast;
 
 
 
 import jar_project1.Client;
-import jar_project1.Server;
+//import jar_project1.Server;
 
 public class MainActivity extends Activity {
 
@@ -42,14 +44,16 @@ public class MainActivity extends Activity {
  // These three variables will be used to comput the Latitudes and Longitudes. Not computing yet
  // the sensor, sensorID.
     
-    int interator;                                             
+    int interator=0;//this is defined in here because in the second time, it will just send
+    //new things.
     ArrayList<Double> Latitudes = new ArrayList<Double>();
     ArrayList<Double> Longitudes = new ArrayList<Double>();
 
 	private ObjectOutputStream output; // output stream to server
 	private ObjectInputStream input; // input stream from server
 	public Socket socket;
-	int flag=0;
+	int flag=0;//used for connection
+	String ip;//will get the ip value from variable value0
     double posa, posb;
     
 	MySQLiteHelper db = new MySQLiteHelper(this);
@@ -61,7 +65,6 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 	    Log.i("MainActivity","ligou");
 
-	    db.deleteAll();
 	}
 
 	@Override
@@ -106,7 +109,7 @@ public class MainActivity extends Activity {
 	  
 	//Determine the conection between the cellphone and the server. 
 	  
-private class socketConection extends AsyncTask<String, Void, String> {
+	  private class socketConection extends AsyncTask<String, Void, String> {
 	
 		  
 		  @Override
@@ -123,7 +126,7 @@ private class socketConection extends AsyncTask<String, Void, String> {
 	            	socket = new Socket();
 		            Log.i("AsyncTask", "try Create");
 		            
-		            SocketAddress sockad = new InetSocketAddress("10.201.223.5", 5555); 
+		            SocketAddress sockad = new InetSocketAddress(ip, 5555); 
 			    	socket.connect(sockad);
 			        Log.i("AsyncTask", "Could Create");
 		    	 	output = new ObjectOutputStream(socket.getOutputStream());
@@ -139,27 +142,27 @@ private class socketConection extends AsyncTask<String, Void, String> {
 			    		//Client. I created the server in a way for making the thread to wait, but it
 			    		//isnt used anymore, but still in the imports, because if you want to use it
 			    		// it is up to you. Feel free to improve this poor methodology used to send.
-			    		for (interator=0; interator<Latitudes.size();interator++){
-			            Log.i("AsyncTask", "try Send again");
-			            //Interator is a global variable. It does not need to be. I was trying another thing
-			            // Feel free to fix it. The Latitude.size() or Logitude.size() or other dont make any
-			            // difference, because all them have the same size.
-			       
-			            //Send object with 10 fields (just really using 2. Just need to adapt it to the rest 8. But it wont be
-			            //difficult. 20 minuts and you finish it 
-						Client sendObj = new Client("a","b","c","d",Latitudes.get(interator),Longitudes.get(interator),"g","h",3,"i");
-				    	Log.i("AsyncTask", "Is Connected");
-
-				    	output.writeObject(sendObj);
-				    	output.flush();
-				    	output.reset();
-				    	Log.i("AsyncTask", "Sent "+Latitudes.size());
-				    	//That is why I believe this fashion isnt interesting. To garantee that
-				    	//the conection will happen, I am putting the thread to sleep 500ms. But it
-				    	//is better to put the thread to exit, or start for an 'OK' of the server
-				    	//to continue sending. The 'OK' is possible with the class Server. (again, that
-				    	//is why it continued in the project. even without using it)
-				    	Thread.sleep(500);
+			    		for (; interator<Latitudes.size();interator++){
+				            Log.i("AsyncTask", "try Send again");
+				            //Interator is a global variable. It does not need to be. I was trying another thing
+				            // Feel free to fix it. The Latitude.size() or Logitude.size() or other dont make any
+				            // difference, because all them have the same size.
+				       
+				            //Send object with 10 fields (just really using 2. Just need to adapt it to the rest 8. But it wont be
+				            //difficult. 20 minuts and you finish it 
+							Client sendObj = new Client("a","b","c","d",Latitudes.get(interator),Longitudes.get(interator),"g","h",3,"i");
+					    	Log.i("AsyncTask", "Is Connected");
+	
+					    	output.writeObject(sendObj);
+					    	output.flush();
+					    	output.reset();
+					    	Log.i("AsyncTask", "Sent "+Latitudes.size());
+					    	//That is why I believe this fashion isnt interesting. To garantee that
+					    	//the conection will happen, I am putting the thread to sleep 500ms. But it
+					    	//is better to put the thread to exit, or start for an 'OK' of the server
+					    	//to continue sending. The 'OK' is possible with the class Server. (again, that
+					    	//is why it continued in the project. even without using it)
+					    	Thread.sleep(500);
 			    		}
 				    
 			    	}
@@ -197,6 +200,8 @@ private class socketConection extends AsyncTask<String, Void, String> {
 		  MINIMUM_TIME_BETWEEN_UPDATES,MINIMUM_DISTANCE_CHANGE_FOR_UPDATES, new MyLocationListener());
 	      Log.i("MainActivity","vaientrarthread");
 
+	      TextView tv = (TextView)findViewById(R.id.button1);
+          tv.setText("Start");
 
 		  task1 = new GPSConection();
 		  //the a means nothing.
@@ -212,8 +217,13 @@ private class socketConection extends AsyncTask<String, Void, String> {
 	      //the gps and sensors
 	      task1.cancel(true);
 	      socketConection task2 = new socketConection();
-        	      
-        	  task2.execute("a");
+	      TextView tv = (TextView)findViewById(R.id.button1);
+	      tv.setText("Continue");//this will change the value of Start button to Restart
+	      flag=0;//will start a new conection
+	      EditText editText3 = (EditText) findViewById(R.id.value0);
+	      ip = editText3.getText().toString();
+			
+          task2.execute("a");
         
 	  }
 	  
@@ -245,7 +255,18 @@ private class socketConection extends AsyncTask<String, Void, String> {
 			}
 		}
 
+		//Erase values on the sqlite
+		public void Erase (View view){
 
+		    db.deleteAll();
+		}
+		
+		
+//Get Sensor Code HERE!!
+		public void GetSensor (View view){
+
+
+		}		
 		
 		//USED FOR THE GPS. I removed all the messages inside it (not necessary). I will
 		//Exclude the commented parts in the final version
