@@ -4,6 +4,7 @@ package com.sensordataacquisition;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 	private Button sensorButton;
 	private TextView outputText;
 	private Gson gson = new Gson();
-	private List<JSONobj> sensorDataList;
+	private List<JSONobj> sensorDataList = new ArrayList();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
