@@ -3,8 +3,6 @@ package com.example.gps_project;
 
 
 import jar_project1.Client;
-//import jar_project1.Server;
-
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,7 +11,9 @@ import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -31,12 +31,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-//import android.widget.Toast;
 import at.abraxas.amarino.Amarino;
 import at.abraxas.amarino.AmarinoIntent;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+//import jar_project1.Server;
+//import android.widget.Toast;
 //import com.example.android2.R;
 
 
@@ -53,8 +54,8 @@ public class MainActivity extends Activity {
 
 	int interator=0;//this is defined in here because in the second time, it will just send
 	//new things.
-	ArrayList<Double> Latitudes = new ArrayList<Double>();
-	ArrayList<Double> Longitudes = new ArrayList<Double>();
+	//ArrayList<Double> Latitudes = new ArrayList<Double>();
+	//ArrayList<Double> Longitudes = new ArrayList<Double>();
 
 	private ObjectOutputStream output; // output stream to server
 	private ObjectInputStream input; // input stream from server
@@ -76,8 +77,9 @@ public class MainActivity extends Activity {
 	
 	private BluetoothReceiver btr = new BluetoothReceiver();
 	private Gson gson = new Gson();
-	private ArrayList<JSONobj> sensorDataList = new ArrayList();
+	private ArrayList<Client> sensorDataList = new ArrayList();
 	Button sensorButton;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,33 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				communicate();
+		
+			
+				Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+				posa=location.getLatitude(); //Store in variable that will go to sqlite
+				posb=location.getLongitude();//Store in variable that will go to sqlite
+				sensorDataList.get(sensorDataList.size()-1).setLatitude(posa);//store in array that will be used again in the conection thread
+				sensorDataList.get(sensorDataList.size()-1).setLongitude(posb);//strore in the array that will be used again in the conection thread
+				Log.i("AsyncTask","Pegou valores"+posa+posb);
+				db.addBook(new Book(Double.toString(posa),Double.toString(posb)));
+
+
+				String RunID, Timestamp, Datee;  
+				SimpleDateFormat sdf;
+				sdf= new SimpleDateFormat("yyyyMMdd_HHmmss");
+				RunID="team4_"+sdf.format(new Date());
+
+				sdf= new SimpleDateFormat("HH:mm:ss");
+				Timestamp="team4_"+sdf.format(new Date());
+				
+				sdf= new SimpleDateFormat("yyyy-MM-dd");
+				Datee="team4_"+sdf.format(new Date());
+				
+				sensorDataList.get(sensorDataList.size()-1).setRunID(RunID);
+				sensorDataList.get(sensorDataList.size()-1).setTimeStamp(Timestamp);
+				sensorDataList.get(sensorDataList.size()-1).setDate(Datee);
+				
 			}
 		});
 
@@ -128,19 +157,35 @@ public class MainActivity extends Activity {
 
 		@Override
 		protected String doInBackground(String... nothing) {
-
+		Client Clientgps;
+		String RunID, Timestamp, Datee;  
+		SimpleDateFormat sdf;
 			while(true){
 				Log.i("AsyncTask","Entrou");
-
+				Clientgps = new Client("Team4","","","",0,0,"null","null",0,"point");
 				Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				sdf= new SimpleDateFormat("yyyyMMdd_HHmmss");
+				RunID="team4_"+sdf.format(new Date());
 
+				sdf= new SimpleDateFormat("HH:mm:ss");
+				Timestamp="team4_"+sdf.format(new Date());
+				
+				sdf= new SimpleDateFormat("yyyy-MM-dd");
+				Datee="team4_"+sdf.format(new Date());
+				
+				Clientgps.setRunID(RunID);
+				Clientgps.setTimeStamp(Timestamp);
+				Clientgps.setDate(Datee);
+				
 				posa=location.getLatitude(); //Store in variable that will go to sqlite
 				posb=location.getLongitude();//Store in variable that will go to sqlite
-				Latitudes.add(posa);//store in array that will be used again in the conection thread
-				Longitudes.add(posb);//strore in the array that will be used again in the conection thread
-				Log.i("AsyncTask","Pegou valores"+posa+posb);
+				Clientgps.setLatitude(posa);//store in array that will be used again in the conection thread
+				Clientgps.setLongitude(posb);//strore in the array that will be used again in the conection thread
+				Log.i("AsyncTask","Pegou valores"+posa+posb+Timestamp);
 				db.addBook(new Book(Double.toString(posa),Double.toString(posb)));
+				sensorDataList.add(Clientgps);
 				try{
+					
 					Log.i("AsyncTask","Rodou");	  
 					Thread.sleep(5000); // sleep for 5 seconds, because we need this for this project
 				}
@@ -188,7 +233,7 @@ public class MainActivity extends Activity {
 					//Client. I created the server in a way for making the thread to wait, but it
 					//isnt used anymore, but still in the imports, because if you want to use it
 					// it is up to you. Feel free to improve this poor methodology used to send.
-					for (; interator<Latitudes.size();interator++){
+					for (; interator<sensorDataList.size();interator++){
 						Log.i("AsyncTask", "try Send again");
 						//Interator is a global variable. It does not need to be. I was trying another thing
 						// Feel free to fix it. The Latitude.size() or Logitude.size() or other dont make any
@@ -196,13 +241,15 @@ public class MainActivity extends Activity {
 
 						//Send object with 10 fields (just really using 2. Just need to adapt it to the rest 8. But it wont be
 						//difficult. 20 minuts and you finish it 
-						Client sendObj = new Client("a","b","c","d",Latitudes.get(interator),Longitudes.get(interator),"g","h",3,"i");
+
+						Client sendObj = sensorDataList.get(interator);
+						//Client sendObj = new Client("a","b","c","d",Latitudes.get(interator),Longitudes.get(interator),"g","h",3,"i");
 						Log.i("AsyncTask", "Is Connected");
 						
 						output.writeObject(sendObj);
 						output.flush();
 						output.reset();
-						Log.i("AsyncTask", "Sent "+Latitudes.size());
+						Log.i("AsyncTask", "Sent "+sensorDataList.size());
 						//That is why I believe this fashion isnt interesting. To garantee that
 						//the conection will happen, I am putting the thread to sleep 500ms. But it
 						//is better to put the thread to exit, or start for an 'OK' of the server
@@ -261,6 +308,7 @@ public class MainActivity extends Activity {
 		//before creating the connection, we will close the gps because I assumed that
 		//we got to the final spot (the NUC), so we dont need anymore to get values from
 		//the gps and sensors
+		
 		task1.cancel(true);
 		socketConection task2 = new socketConection();
 		TextView tv = (TextView)findViewById(R.id.button1);
@@ -313,6 +361,7 @@ public class MainActivity extends Activity {
 		Amarino.sendDataToArduino(this, DEVICE_ADDRESS[deviceAddressCounter], 's', "");
 	}
 
+	/*
 	// class wrapper for json data received from arduino
 	public class JSONobj {
 		private String SENSORID;
@@ -343,12 +392,13 @@ public class MainActivity extends Activity {
 			return SENSORVALUE;
 		}
 	}
-
+*/
 	public class BluetoothReceiver extends BroadcastReceiver {
 
 		public void onReceive(Context context, Intent intent) {
 			String data = null;
-			JSONobj jsonObj = new JSONobj();
+//++			JSONobj jsonObj = new JSONobj();
+			Client Client = new Client("","","","",0,0,"","",0,"sensor");
 			// the device address from which the data was sent
 			final String address = intent.getStringExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS);
 
@@ -367,13 +417,13 @@ public class MainActivity extends Activity {
 						while(reader.hasNext()) {
 							String temp = reader.nextName();
 							if (temp.equals("sensor_id")) {
-								jsonObj.setSensorID(reader.nextString());
+								Client.setSensorID(reader.nextString());
 							}
 							else if (temp.equals("sensor_type")) {
-								jsonObj.setSensorType(reader.nextString());
+								Client.setSensorType(reader.nextString());
 							}
 							else if (temp.equals("sensor_value")) {
-								jsonObj.setSensorValue(reader.nextDouble());
+								Client.setSensorValue(reader.nextDouble());
 							}
 							else reader.skipValue();
 						}
@@ -382,8 +432,8 @@ public class MainActivity extends Activity {
 					}
 
 					// add custom json object type to the sensor data list
-					sensorDataList.add(jsonObj);
-
+					sensorDataList.add(Client);
+					
 					// output info to the text view
 					//outputText.append(data + "\n");
 					//outputText.append(jsonObj.getSensorID() + " " 
