@@ -116,7 +116,7 @@ public class FusiontablesSample {
           httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
       
       // run commands
-      listTables();
+      //listTables();
       //THe create is off. We dont need to create every time. If we want to create every
       //time, we just need to change insertData(.adasdasdadsa) and showRows(asasdasd) to:
       //insertData(tableID,longitude,latitude)
@@ -125,9 +125,9 @@ public class FusiontablesSample {
       
       //THe table is not complete, but I already edited it, so I know how to do. Just did not
       //finish it. Too tired today. (it is like a normal sql to update, create, etc...)
-      String tableId = createTable();     //create a table
-      insertData("1ZQImNP5cpHhac_ijyvKHBaCFBW-KwVN-f8TVNy4", CLientFinal);                //insert data into table
-      showRows("1ZQImNP5cpHhac_ijyvKHBaCFBW-KwVN-f8TVNy4");                  //not quite working yet
+      //String tableId = createTable();     //create a table
+      insertData("1UUYNnRMbbTWzkTV-TY1vauxovd_c4gtL-4PPNfg", CLientFinal);                //insert data into table
+      showRows("1UUYNnRMbbTWzkTV-TY1vauxovd_c4gtL-4PPNfg");                  //not quite working yet
 //      deleteTable(tableId);
       // success!
       return;

@@ -48,6 +48,10 @@ void loop() {
         Serial.println("Calibrate Selected!");
         calcCoefficients(resistance, lux, A, B);
         calculationsComplete = true;
+      } else {
+        Serial.println("Light Sensor Calibration"); 
+        Serial.println("Which light source are you using?");
+        Serial.println("'b' - bright | 'd' - dark | 'q' - calibrate"); 
       }
     }
   } 
@@ -89,6 +93,13 @@ void querySensor(byte flag, byte numOfValues) {
     constantRes = calcResistance(constantVolt);
     constantLux = calcLux(constantRes, A, B);
     
+    Serial.print("Voltage: ");
+    Serial.println(constantVolt);
+    Serial.print("Resistance: ");
+    Serial.println(constantRes);
+    Serial.print("Lux: ");
+    Serial.println(constantLux); 
+    
     // create json object using aJson library
     aJsonObject *root;
     root = aJson.createObject();
@@ -96,7 +107,11 @@ void querySensor(byte flag, byte numOfValues) {
     aJson.addItemToObject(root, "sensor_type", aJson.createItem(TYPE));
     aJson.addItemToObject(root, "sensor_value", aJson.createItem(constantLux));
     char* jsonString = aJson.print(root);
-    meet.send(jsonString);
+    if (string !=NULL) {
+      Serial.println(jsonString);
+      Serial.println(); 
+      meet.send(jsonString);
+    }
     free(root);
     free(jsonString);
     

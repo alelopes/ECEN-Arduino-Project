@@ -9,7 +9,7 @@
     tools:context=".SQLActivity" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/JSONOutText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
@@ -18,7 +18,7 @@
         android:id="@+id/list"
         android:layout_width="wrap_content"
         android:layout_height="280dip"
-        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignLeft="@+id/JSONOutText"
         android:layout_centerVertical="true"
         android:focusableInTouchMode="false"
         android:text="@string/value1" >
