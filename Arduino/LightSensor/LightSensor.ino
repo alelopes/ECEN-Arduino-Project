@@ -8,9 +8,9 @@
 double voltage[2] = {0.0};    
 double resistance[2] = {0.0};
 double lux[2] = {0.0};
-double A = -1.08;
-double B = 5.42;
-//boolean calculationsComplete = false;
+float A = -1.08;
+float B = 5.42;
+boolean calculationsComplete = false;
 
 // these variables are for continuous temp readings
 double constantVolt = 0.0;
