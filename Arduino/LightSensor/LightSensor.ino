@@ -4,11 +4,13 @@
 #define TYPE "light"
 
 // these variables are used for light sensor calibrations
+
 double voltage[2] = {0.0};    
 double resistance[2] = {0.0};
 double lux[2] = {0.0};
-float A, B = {0.0};
-boolean calculationsComplete = false;
+double A = -1.08;
+double B = 5.42;
+//boolean calculationsComplete = false;
 
 // these variables are for continuous temp readings
 double constantVolt = 0.0;
@@ -19,10 +21,12 @@ MeetAndroid meet;
 
 void setup() {
   Serial.begin(9600);
-  Serial1.begin(9600);  
+  Serial1.begin(9600); 
+  /* 
   Serial.println("Light Sensor Calibration"); 
   Serial.println("Which light source are you using?");
   Serial.println("'b' - bright | 'd' - dark | 'q' - calibrate"); 
+  */
   meet.registerFunction(querySensor, 's');
 }
 
@@ -46,7 +50,7 @@ void loop() {
         calculationsComplete = true;
       }
     }
-  }
+  } 
   /*
   // if calibration is complete, then continue on with the rest of the program
   while (calculationsComplete) {
@@ -88,11 +92,13 @@ void querySensor(byte flag, byte numOfValues) {
     // create json object using aJson library
     aJsonObject *root;
     root = aJson.createObject();
-    aJson.addItemToObject(root, "sensor-id", aJson.createItem(ID));
-    aJson.addItemToObject(root, "sensor-type", aJson.createItem(TYPE));
-    aJson.addItemToObject(root, "sensor-value", aJson.createItem(constantLux));
+    aJson.addItemToObject(root, "sensor_id", aJson.createItem(ID));
+    aJson.addItemToObject(root, "sensor_type", aJson.createItem(TYPE));
+    aJson.addItemToObject(root, "sensor_value", aJson.createItem(constantLux));
     char* jsonString = aJson.print(root);
     meet.send(jsonString);
+    free(root);
+    free(jsonString);
     
 }
 
@@ -115,7 +121,9 @@ void calcCoefficients(double resistance[], double lux[], float &A, float &B) {
   lux[1] = 10.0; // hand covered
   double C = 1 / (log10(resistance[0]) - log10(resistance[1]));
   A = C * (log10(lux[0]) - log10(lux[1]));
-  B = C * ((-log10(resistance[1]) * log10(lux[0])) + (log10(resistance[0]) * log10(lux[1])));  
+  B = C * ((-log10(resistance[1]) * log10(lux[0])) + (log10(resistance[0]) * log10(lux[1])));
+  Serial.println(A);
+  Serial.println(B);  
 }
 
 // calculates lux value
