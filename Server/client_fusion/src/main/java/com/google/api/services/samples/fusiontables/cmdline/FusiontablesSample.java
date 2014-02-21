@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
+import jar_project1.Client;
 
 public class FusiontablesSample {
 
@@ -100,7 +101,7 @@ public class FusiontablesSample {
   // The Fusion Tables look like slow because Im using the View class to show a lot of infos
   //in the Console. We just need to remove it, and the server will be faster.
   //Just put there because we are in the debugging fase.
-  public void Start(double longitude, double latitude) {
+  public void Start(Client CLientFinal) {
     try {
      
       //facilities to interface with a website
@@ -124,9 +125,9 @@ public class FusiontablesSample {
       
       //THe table is not complete, but I already edited it, so I know how to do. Just did not
       //finish it. Too tired today. (it is like a normal sql to update, create, etc...)
-      //String tableId = createTable();     //create a table
-      insertData("1KijeMNY94E9QkxZEYOBEYKbzl-XEeVd9KZ0pT0g", longitude, latitude);                //insert data into table
-      showRows("1KijeMNY94E9QkxZEYOBEYKbzl-XEeVd9KZ0pT0g");                  //not quite working yet
+      String tableId = createTable();     //create a table
+      insertData("1ZQImNP5cpHhac_ijyvKHBaCFBW-KwVN-f8TVNy4", CLientFinal);                //insert data into table
+      showRows("1ZQImNP5cpHhac_ijyvKHBaCFBW-KwVN-f8TVNy4");                  //not quite working yet
 //      deleteTable(tableId);
       // success!
       return;
@@ -145,7 +146,7 @@ public class FusiontablesSample {
   private static void showRows(String tableId) throws IOException {
     View.header("Showing Rows From Table");
 
-    Sql sql = fusiontables.query().sql("SELECT Arroz,Text,Number,Location,Date FROM " + tableId);
+    Sql sql = fusiontables.query().sql("SELECT ClientID,RunID,TimeStamp,Date,Location,SensorID,SensorType,SensorValue,Attribute FROM " + tableId);
 
     try {
       sql.execute();
@@ -177,7 +178,7 @@ public class FusiontablesSample {
   }
 
   
-  //Never used becasue we dont create a new table all the time.
+  //Never used because we dont create a new table all the time.
   /** Create a table for the authenticated user. */
   private static String createTable() throws IOException {
     View.header("Create Sample Table");
@@ -189,39 +190,40 @@ public class FusiontablesSample {
     table.setDescription("Sample Table");
 
     // Set columns for new table
-    table.setColumns(Arrays.asList(new Column().setName("Arroz").setType("STRING"),
+    table.setColumns(Arrays.asList(/*new Column().setName("Arroz").setType("STRING"),
     		new Column().setName("Text").setType("STRING"),
             new Column().setName("Number").setType("NUMBER"),
             new Column().setName("Location").setType("LOCATION"),
             new Column().setName("Date").setType("DATETIME")));
-    		
+    		*/
     	//There will be the final version.	
-    	/*new Column().setName("ClientID").setType("STRING"),
+    	new Column().setName("ClientID").setType("STRING"),
     	new Column().setName("RunID").setType("STRING"),
    		new Column().setName("TimeStamp").setType("STRING"),
-    	new Column().setName("Date").setType("DATETIME"),
-   		new Column().setName("Latitude").setType("LOCATION"),
-   		new Column().setName("Longitude").setType("LOCATION"),
+    	new Column().setName("Date").setType("STRING"),
+   		new Column().setName("Location").setType("LOCATION"),
         new Column().setName("SensorID").setType("STRING"),
         new Column().setName("SensorType").setType("STRING"),
-        new Column().setName("SensorValue").setType("STRING"),
+        new Column().setName("SensorValue").setType("NUMBER"),
         new Column().setName("Attribute").setType("STRING")));
-*/
     // Adds a new column to the table.
     Fusiontables.Table.Insert t = fusiontables.table().insert(table);
     Table r = t.execute();
-
     View.show(r);
 
     return r.getTableId();
   }
 
   /** Inserts a row in the newly created table for the authenticated user. */
-  private static void insertData(String tableId, double longitude, double latitude ) throws IOException {
-	  String Locat = Double.toString(latitude) +", " + Double.toString(longitude);
+  private static void insertData(String tableId, Client ClientFinal ) throws IOException {
+	  String Locat = Double.toString(ClientFinal.getLatitude()) +", " + Double.toString(ClientFinal.getLongitude());
+	  
 	  System.out.printf("%s", Locat);
-	  Sql sql = fusiontables.query().sql("INSERT INTO " +tableId+ "(Arroz,Text,Number,Location,Date)"
-	  		+ "VALUES ('122','ss','4','"+Locat+"','"+new DateTime(new Date())+"')");
+	  Sql sql = fusiontables.query().sql("INSERT INTO " +tableId+ "(ClientID,RunID,TimeStamp,Date,Location,SensorID,SensorType,SensorValue,Attribute)"
+		  		+ "VALUES ('" +ClientFinal.getClientID()+"','" +ClientFinal.getRunID()+"','" +ClientFinal.getTimeStamp()+"','" +ClientFinal.getDate()+"','" +Locat+"','" +ClientFinal.getSensorID()+"','" +ClientFinal.getSensorType()+"','" +ClientFinal.getSensorValue()+"','"+ClientFinal.getAttribute()+"')");
+
+	  //	  Sql sql = fusiontables.query().sql("INSERT INTO " +tableId+ "(Arroz,Text,Number,Location,Date)"
+	//  		+ "VALUES ('122','ss','4','"+Locat+"','"+new DateTime(new Date())+"')");
 
     try {
       sql.execute();

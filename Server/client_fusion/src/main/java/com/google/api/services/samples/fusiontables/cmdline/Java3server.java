@@ -68,10 +68,6 @@ public class Java3server extends JFrame {
 	 } // end Server constructor
 	
 	
-	
-	
-	
-	
 	//FIRST PART OF THE SERVER IT WILL COME HERE BEFORE.
 	public void runServer()
 	{
@@ -129,8 +125,8 @@ public class Java3server extends JFrame {
 		//It isnt that smart like this.
 		FusiontablesSample Fusion = new FusiontablesSample();
 
-	    ArrayList<Double> Latitudes = new ArrayList<Double>();
-	    ArrayList<Double> Longitudes = new ArrayList<Double>();
+	    ArrayList<Client> FinalClient = new ArrayList();
+	//    ArrayList<Double> Longitudes = new ArrayList<Double>();
 
 		String clientID, RunID, TimeStamp, Date, SensorID, SensorType, Attribute;
 		double SensorValue;	
@@ -148,19 +144,9 @@ public class Java3server extends JFrame {
 				Client recobj = (Client) input.readObject();
 				displayMessage("\nValues:");
  
+				FinalClient.add(recobj);
 				//As you can see, all the variables are subscribing, but the Logitude and
 				//Latitude are arrays, so they are stored.
-				Attribute=recobj.getAttribute();
-				clientID=recobj.getClientID();
-				Date=recobj.getDate();
-				Latitudes.add(recobj.getLatitude());
-				Longitudes.add(recobj.getLongitude());
-				RunID=recobj.getRunID();
-				SensorID=recobj.getSensorID();
-				SensorType=recobj.getSensorType();
-				SensorValue=recobj.getSensorValue();
-				TimeStamp=recobj.getTimeStamp();
-				System.out.println(Attribute+clientID+Date);	 //just to see some conection
 
 				//I tried to send an 'OK' but got an error. So, I the conection with the 
 				//Thread, as explaned in the android code.
@@ -185,9 +171,18 @@ public class Java3server extends JFrame {
 		
 		//After the client closes the conection, it comes here to send the Logitudes and Latitudes
 		//to the Fusion Tables
-		for (int i=0;i<Longitudes.size();i++){
-			Fusion.Start(Longitudes.get(i),Latitudes.get(i));
-			
+		for (int i=0;i<FinalClient.size();i++){
+			System.out.println(FinalClient.get(i).getAttribute()+" "+FinalClient.get(i).getClientID()+" "+FinalClient.get(i).getDate()+" "+FinalClient.get(i).getRunID()+" "+FinalClient.get(i).getSensorID()+" "+FinalClient.get(i).getSensorType()+" "+FinalClient.get(i).getSensorValue()+" "+FinalClient.get(i).getTimeStamp()
+					);	 //just to see some conection
+
+			Fusion.Start(FinalClient.get(i));
+			if ((i%30==0) && (i!=0)){
+				try {
+				    Thread.sleep(60000);
+				} catch(InterruptedException ex) {
+				    Thread.currentThread().interrupt();
+				}
+			}
 		}
 		
 	} // end method processConnection
