@@ -154,11 +154,16 @@ public class MainActivity extends Activity {
 		registerReceiver(btr, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 		//Amarino.connect(this, DEVICE_ADDRESS);
 	}
+	
+	protected void onResume() {
+		super.onResume();
+		registerReceiver(btr, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
+	}
 
 	// used by Android <--> Arduino code
 	protected void onStop() {
 		super.onStop();
-		Amarino.disconnect(this, DEVICE_ADDRESS);
+		//Amarino.disconnect(this, DEVICE_ADDRESS);
 		unregisterReceiver(btr);
 	}
 
@@ -417,7 +422,7 @@ public class MainActivity extends Activity {
 */
 	public void disconnectArduino() {
 		Amarino.disconnect(this, DEVICE_ADDRESS);
-		unregisterReceiver(btr);
+		//unregisterReceiver(btr);
 	}
 	
 	public class BluetoothReceiver extends BroadcastReceiver {

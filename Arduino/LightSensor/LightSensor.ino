@@ -99,6 +99,7 @@ void querySensor(byte flag, byte numOfValues) {
     Serial.println(constantRes);
     Serial.print("Lux: ");
     Serial.println(constantLux); 
+    Serial.println();
     
     // create json object using aJson library
     aJsonObject *root;
@@ -107,7 +108,7 @@ void querySensor(byte flag, byte numOfValues) {
     aJson.addItemToObject(root, "sensor_type", aJson.createItem(TYPE));
     aJson.addItemToObject(root, "sensor_value", aJson.createItem(constantLux));
     char* jsonString = aJson.print(root);
-    if (string !=NULL) {
+    if (jsonString !=NULL) {
       Serial.println(jsonString);
       Serial.println(); 
       meet.send(jsonString);
